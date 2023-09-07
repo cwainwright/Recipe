@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import EventKit
 
 struct Ingredient: Codable, Identifiable {
     var id: UUID = UUID()
@@ -46,9 +47,27 @@ extension Ingredient {
         }
         // if unit is not empty
         if self.hasUnit {
-            return "\u{2022} \(string_measure) \(unit) of \(ingredient)"
+            return "\(string_measure) \(unit) of \(ingredient)"
         }
-        return "\u{2022} \(string_measure) \(ingredient)"
+        return "\(string_measure) \(ingredient)"
+    }
+    
+    func toList() -> String {
+        "\u{2022} \(toString())"
+    }
+}
+
+// export to reminders
+extension Ingredient {
+    func toReminder(eventStore: EKEventStore, calendar: EKCalendar) throws {
+        
+        // create Reminder
+        let reminder = EKReminder(eventStore: eventStore)
+        reminder.title = toString()
+        reminder.calendar = calendar
+        
+        // try to save to calendar
+        try eventStore.save(reminder, commit: false)
     }
 }
 

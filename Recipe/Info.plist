@@ -5,25 +5,39 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeIconSystemGenerated</key>
+			<integer>1</integer>
+			<key>CFBundleTypeName</key>
+			<string>Recipe Document</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.recipe.recipe</string>
 			</array>
 			<key>NSUbiquitousDocumentUserActivityType</key>
-			<string>$(PRODUCT_BUNDLE_IDENTIFIER).example-document</string>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).recipe</string>
 		</dict>
 	</array>
-	<key>UTImportedTypeDeclarations</key>
+	<key>NSCalendarUsageDescription</key>
+	<string>Export ingredient lists to shopping list</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Export ingredient lists to shopping list</string>
+	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
+				<string>public.content</string>
+				<string>public.composite-content</string>
 				<string>com.apple.package</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Recipe Document containing content and image</string>
+			<string>Recipe Document</string>
+			<key>UTTypeIcons</key>
+			<dict/>
 			<key>UTTypeIdentifier</key>
 			<string>com.recipe.recipe</string>
 			<key>UTTypeTagSpecification</key>
@@ -35,5 +49,7 @@
 			</dict>
 		</dict>
 	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array/>
 </dict>
 </plist>

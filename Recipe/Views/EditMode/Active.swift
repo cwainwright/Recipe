@@ -48,20 +48,6 @@ struct Active: View {
             }
             EditButton()
         }
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-struct Active_Previews: PreviewProvider {
-    static var previews: some View {
-        Active()
-            .environmentObject(RecipeDocument.exampleRecipe)
-    }
-}
-
-struct Active_Empty_Previews: PreviewProvider {
-    static var previews: some View {
-        Active()
-            .environmentObject(RecipeDocument.emptyRecipe)
+        .navigationBarTitleDisplayMode(.automatic)
     }
 }

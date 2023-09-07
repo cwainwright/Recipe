@@ -25,6 +25,7 @@ struct InstructionsView: View {
                             Text("\(index+1).")
                             Text(instruction.instruction)
                         }
+                        .padding(.vertical, 1)
                     }
                 }
             }

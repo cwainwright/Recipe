@@ -24,8 +24,9 @@ struct IngredientsView: View {
                 Grid(alignment: .topLeading) {
                     ForEach(document.recipe.ingredients, id: \.id) { ingredient in
                         GridRow {
-                            Text(ingredient.toString())
+                            Text(ingredient.toList())
                         }
+                        .padding(.vertical, 1)
                     }
                 }
             }

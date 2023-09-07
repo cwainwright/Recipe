@@ -6,26 +6,63 @@
 //
 
 import SwiftUI
+import EventKit
 
 struct Inactive: View {
     
     @EnvironmentObject var document: RecipeDocument
+    @State var showRemindersSheet: Bool = false
+    
+    let eventStore: EKEventStore = EKEventStore()
     
     var body: some View {
         ScrollView {
-            DescriptionView()
-//                .padding(.horizontal)
-//                .padding(.horizontal)
-            IngredientsView()
-//                .padding(.horizontal)
-            InstructionsView()
-//                .padding(.horizontal)
+            VStack {
+                DescriptionView()
+                IngredientsView()
+                InstructionsView()
+            }
+            .padding([.horizontal, .bottom])
         }
-        .padding(.horizontal)
         .toolbar {
-            EditButton()
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button {
+                        showRemindersSheet.toggle()
+                    } label: {
+                        Label("Export Shopping List", systemImage: "checklist.unchecked")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                EditButton()
+            }
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showRemindersSheet) {
+            CalendarPicker(eventStore: eventStore)
+                .onAppear {
+                    switch EKEventStore.authorizationStatus(for: .reminder) {
+                        case .authorized:
+                            print("Authorized")
+                        case .denied:
+                            print("Access denied")
+                        case .notDetermined:
+                            eventStore.requestAccess(to: .reminder) { granted, error in
+                                if granted {
+                                    print("Access granted")
+                                } else {
+                                    print("Access denied")
+                                }
+                            }
+                            print("Not Determined")
+                        default:
+                            print("Case Default")
+                        }
+                }
+        }
+        .navigationBarTitleDisplayMode(.automatic)
         .background(
             ZStack {
                 Image(uiImage: document.image)

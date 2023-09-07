@@ -7,10 +7,11 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import EventKit
 
 extension UTType {
     static var exampleRecipe: UTType {
-        UTType(importedAs: "com.recipe.recipe")
+        UTType(exportedAs: "com.recipe.recipe")
     }
 }
 
@@ -132,9 +133,16 @@ extension RecipeDocument {
     }
 }
 
+// Metadata Functions
+extension RecipeDocument {
+    func registerUndoDurationChange(newDuration: Int, oldDuration: Float, undoManager: UndoManager?) {
+            
+    }
+}
+
 // Ingredient Functions
 extension RecipeDocument {
-    
+
     func addIngredient(ingredient: Ingredient, undoManager: UndoManager? = nil) {
         recipe.ingredients.append(Ingredient())
         let count = recipe.ingredients.count
@@ -286,9 +294,7 @@ extension RecipeDocument {
 
     func deleteInstructions(offsets: IndexSet, undoManager: UndoManager? = nil) {
         let oldInstructions = recipe.instructions
-        withAnimation {
-            recipe.instructions.remove(atOffsets: offsets)
-        }
+        recipe.instructions.remove(atOffsets: offsets)
         
         undoManager?.registerUndo(withTarget: self) { doc in
             doc.replaceInstructions(with: oldInstructions, undoManager: undoManager)
@@ -298,9 +304,7 @@ extension RecipeDocument {
     /// Relocates the specified items, and registers an undo action.
     func moveInstructionsAt(offsets: IndexSet, toOffset: Int, undoManager: UndoManager? = nil) {
         let oldInstructions = recipe.instructions
-        withAnimation {
-            recipe.instructions.move(fromOffsets: offsets, toOffset: toOffset)
-        }
+        recipe.instructions.move(fromOffsets: offsets, toOffset: toOffset)
         
         undoManager?.registerUndo(withTarget: self) { doc in
             // Use the replaceItems symmetric undoable-redoable function.
@@ -422,6 +426,24 @@ extension RecipeDocument {
             undoManager?.registerUndo(withTarget: self) { doc in
                 doc.replaceUtensils(with: newUtensils, undoManager: undoManager, animation: nil)
             }
+        }
+    }
+}
+
+extension RecipeDocument {
+    func generateReminders(eventStore: EKEventStore, calendar: EKCalendar) {
+        do {
+            for ingredient in recipe.ingredients {
+                try ingredient.toReminder(eventStore: eventStore, calendar: calendar)
+            }
+        } catch {
+            print("Missing Calendar or EKStore")
+            return
+        }
+        do {
+            try eventStore.commit()
+        } catch {
+            print("EKStore could not commit changes")
         }
     }
 }

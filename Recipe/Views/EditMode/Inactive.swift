@@ -11,18 +11,36 @@ import EventKit
 struct Inactive: View {
     
     @EnvironmentObject var document: RecipeDocument
-    @State var showRemindersSheet: Bool = false
     
+    var geometry: GeometryProxy
+    
+    @State private var showRemindersSheet: Bool = false
     let eventStore: EKEventStore = EKEventStore()
     
     var body: some View {
         ScrollView {
             VStack {
-                DescriptionView()
-                IngredientsView()
-                InstructionsView()
+                if geometry.size.width <= geometry.size.height {
+                    ImageView()
+                    DescriptionView()
+                    IngredientsView()
+                    InstructionsView()
+                } else {
+                    HStack {
+                        VStack {
+                            ImageView()
+                            InstructionsView()
+                        }
+                        .frame(maxWidth: .infinity)
+                        VStack {
+                            DescriptionView()
+                            IngredientsView()
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
             }
-            .padding([.horizontal, .bottom])
+            .padding()
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -62,29 +80,33 @@ struct Inactive: View {
                         }
                 }
         }
-        .navigationBarTitleDisplayMode(.automatic)
         .background(
             ZStack {
                 Image(uiImage: document.image)
-                    .ignoresSafeArea(.all)
+                    .resizable()
                     .scaledToFill()
                 Rectangle()
-                    .fill(.regularMaterial)
+                    .fill(.thinMaterial)
             }
+            .ignoresSafeArea()
         )
     }
 }
 
 struct Inactive_Preview: PreviewProvider {
     static var previews: some View {
-        Inactive()
-            .environmentObject(RecipeDocument.exampleRecipe)
+        GeometryReader { geometry in
+            Inactive(geometry: geometry)
+                .environmentObject(RecipeDocument.example)
+        }
     }
 }
 
 struct Inactive_Empty_Preview: PreviewProvider {
     static var previews: some View {
-        Inactive()
-            .environmentObject(RecipeDocument.emptyRecipe)
+        GeometryReader { geometry in
+            Inactive(geometry: geometry)
+            .environmentObject(RecipeDocument.empty)
+        }
     }
 }

@@ -11,21 +11,33 @@ struct Active: View {
     @EnvironmentObject var document: RecipeDocument
     @Environment(\.undoManager) private var undoManager
     
+    var geometry: GeometryProxy
+    
     @State private var showImageSelector = false
     
     var body: some View {
-        List {
-            Section("Description") {
-                DescriptionField()
-            }
-            Section("Ingredients") {
-                IngredientList()
-            }
-            Section("Instructions") {
-                InstructionList()
-            }
-            Section("Image") {
-                ImageSelect(showSheet: $showImageSelector)
+        VStack {
+            // Geometry is Portrait
+            if geometry.size.width <= geometry.size.height {
+                List {
+                    RecipeDetails(geometry: geometry)
+                    IngredientList()
+                    InstructionList()
+                    ImageSelect(showSheet: $showImageSelector)
+                }
+            } else {
+                VStack {
+                    HStack {
+                        List {
+                            RecipeDetails(geometry: geometry)
+                            ImageSelect(showSheet: $showImageSelector)
+                        }
+                        List {
+                            IngredientList()
+                            InstructionList()
+                        }
+                    }
+                }
             }
         }
         .sheet(isPresented: $showImageSelector) {
@@ -48,6 +60,5 @@ struct Active: View {
             }
             EditButton()
         }
-        .navigationBarTitleDisplayMode(.automatic)
     }
 }

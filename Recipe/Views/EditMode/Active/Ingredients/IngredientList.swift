@@ -12,15 +12,17 @@ struct IngredientList: View {
     @EnvironmentObject var document: RecipeDocument
     
     var body: some View {
-        ForEach(document.recipe.ingredients.indices, id: \.self) { index in
-            IngredientRow(index: index)
-        }
-        .onDelete { document.deleteIngredients(offsets: $0, undoManager: undoManager) }
-        .onMove { document.moveIngredientsAt(offsets: $0, toOffset: $1, undoManager: undoManager) }
-        
-        Button("Add Ingredient") {
-            withAnimation {
-                document.addIngredient(ingredient:Ingredient(), undoManager: undoManager)
+        Section("Ingredients") {
+            ForEach(document.recipe.ingredients.indices, id: \.self) { index in
+                IngredientRow(index: index)
+            }
+            .onDelete { document.deleteIngredients(offsets: $0, undoManager: undoManager) }
+            .onMove { document.moveIngredientsAt(offsets: $0, toOffset: $1, undoManager: undoManager) }
+            
+            Button("Add Ingredient") {
+                withAnimation {
+                    document.addIngredient(ingredient:Ingredient(), undoManager: undoManager)
+                }
             }
         }
     }

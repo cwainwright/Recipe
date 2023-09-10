@@ -38,8 +38,8 @@ final class RecipeDocument: ReferenceFileDocument {
         self.recipe = recipe
     }
     
-    init(description: String="", ingredients: Array<Ingredient>=[], instructions: Array<Instruction>=[], utensils: Array<Utensil>=[]) {
-        recipe = .init(description: description, instructions: instructions, ingredients: ingredients, utensils: utensils)
+    init(description: String="", duration: Int=30, serves: Int=4, ingredients: Array<Ingredient>=[], instructions: Array<Instruction>=[], utensils: Array<Utensil>=[]) {
+        recipe = .init(description: description, duration: duration, serves: serves, instructions: instructions, ingredients: ingredients, utensils: utensils)
     }
     
     init(configuration: ReadConfiguration) throws {
@@ -90,22 +90,29 @@ final class RecipeDocument: ReferenceFileDocument {
 
 // Example Recipe
 extension RecipeDocument {
-    static var exampleRecipe = RecipeDocument(
+    static var example = RecipeDocument(
         recipe: Recipe.example
     )
-    static var emptyRecipe = RecipeDocument(
+    static var empty = RecipeDocument(
         recipe: Recipe.empty
     )
 }
 
-// Description Functions
+
 extension RecipeDocument {
-    func registerUndoDescriptionChange(oldDescription: String, undoManager: UndoManager? = nil) {
-        let newDesciption = recipe.description
+    func registerUndoTextChange(target: Binding<String>, newValue: String, oldValue: String, undoManager: UndoManager? = nil) {
+        target.wrappedValue = newValue
         
-        registerUndoDescriptionChange(newDescription: newDesciption, oldDescription: oldDescription, undoManager: undoManager)
+        undoManager?.registerUndo(withTarget: self) { doc in
+            target.wrappedValue = oldValue
+            
+            undoManager?.registerUndo(withTarget: self) { doc in
+                target.wrappedValue = newValue
+            }
+        }
     }
     
+    // Description Functions
     func registerUndoDescriptionChange(newDescription: String, oldDescription: String, undoManager: UndoManager? = nil) {
         
         undoManager?.registerUndo(withTarget: self) { doc in
@@ -116,10 +123,20 @@ extension RecipeDocument {
             }
         }
     }
-}
 
-// Image Functions
-extension RecipeDocument {
+    // Serves Functions
+    func registerUndoServesChange(oldValue: Int, newValue: Int, undoManager: UndoManager? = nil) {
+
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.recipe.serves = oldValue
+            
+            undoManager?.registerUndo(withTarget: self) { doc in
+                doc.recipe.serves = newValue
+            }
+        }
+    }
+
+    // Image Functions
     func registerUndoImageChange(newImage: UIImage, undoManager: UndoManager? = nil) {
         let oldImage = self.image
         
@@ -131,18 +148,19 @@ extension RecipeDocument {
             }
         }
     }
-}
-
-// Metadata Functions
-extension RecipeDocument {
-    func registerUndoDurationChange(newDuration: Int, oldDuration: Float, undoManager: UndoManager?) {
+    
+    // Metadata Functions
+    func registerUndoDurationChange(oldValue: Int, newValue: Int, undoManager: UndoManager? = nil) {
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.recipe.duration = oldValue
             
+            undoManager?.registerUndo(withTarget: self) { doc in
+                doc.recipe.duration = newValue
+            }
+        }
     }
-}
 
-// Ingredient Functions
-extension RecipeDocument {
-
+    // Ingredient Functions
     func addIngredient(ingredient: Ingredient, undoManager: UndoManager? = nil) {
         recipe.ingredients.append(Ingredient())
         let count = recipe.ingredients.count
@@ -153,7 +171,6 @@ extension RecipeDocument {
         }
     }
     
-    /// Deletes an ingredient at specified index
     func deleteIngredient(index: Int, undoManager: UndoManager? = nil) {
         let oldItems = recipe.ingredients
         withAnimation {
@@ -165,7 +182,6 @@ extension RecipeDocument {
         }
     }
     
-    /// Replaces the existing items with a new set of items.
     func replaceIngredients(with newIngredients: [Ingredient], undoManager: UndoManager? = nil, animation: Animation? = .default) {
         let oldIngredients = recipe.ingredients
         
@@ -189,7 +205,6 @@ extension RecipeDocument {
         }
     }
     
-    /// Relocates the specified items, and registers an undo action.
     func moveIngredientsAt(offsets: IndexSet, toOffset: Int, undoManager: UndoManager? = nil) {
         let oldIngredients = recipe.ingredients
         withAnimation {
@@ -242,11 +257,8 @@ extension RecipeDocument {
             }
         }
     }
-}
 
-// Instruction Functions
-extension RecipeDocument {
-    
+    // Instruction Functions
     func addInstruction(instruction: Instruction, undoManager: UndoManager? = nil) {
         recipe.instructions.append(instruction)
         let count = recipe.instructions.count
@@ -279,7 +291,6 @@ extension RecipeDocument {
         deleteInstructions(offsets: indexSet, undoManager: undoManager)
     }
     
-    /// Replaces the existing items with a new set of items.
     func replaceInstructions(with newInstructions: [Instruction], undoManager: UndoManager? = nil, animation: Animation? = .default) {
         let oldInstructions = recipe.instructions
         
@@ -301,7 +312,6 @@ extension RecipeDocument {
         }
     }
     
-    /// Relocates the specified items, and registers an undo action.
     func moveInstructionsAt(offsets: IndexSet, toOffset: Int, undoManager: UndoManager? = nil) {
         let oldInstructions = recipe.instructions
         recipe.instructions.move(fromOffsets: offsets, toOffset: toOffset)
@@ -326,11 +336,8 @@ extension RecipeDocument {
             }
         }
     }
-}
 
-// Utensil Functions
-extension RecipeDocument {
-    
+    // Utensil Functions
     func addUtensil(utensil: Utensil, undoManager: UndoManager? = nil) {
         recipe.utensils.append(utensil)
         let count = recipe.utensils.count
@@ -430,6 +437,7 @@ extension RecipeDocument {
     }
 }
 
+// Generate Reminders
 extension RecipeDocument {
     func generateReminders(eventStore: EKEventStore, calendar: EKCalendar) {
         do {
@@ -447,3 +455,4 @@ extension RecipeDocument {
         }
     }
 }
+

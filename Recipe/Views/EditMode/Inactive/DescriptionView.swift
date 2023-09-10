@@ -11,23 +11,20 @@ struct DescriptionView: View {
     @EnvironmentObject var document: RecipeDocument
     
     var body: some View {
-        VStack {
-            Image(uiImage: document.image)
-                .resizable()
-                .scaledToFill()
-                .frame(maxHeight: 200)
-                .clipped()
-                .cornerRadius(5)
-            if (document.recipe.description != ""){
-                ScrollView {
-                    Text(document.recipe.description)
-                        .multilineTextAlignment(.leading)
+        if (document.recipe.description != ""){
+            MaterialCard {
+                VStack {
+                    Text("Description")
+                        .font(.title2)
+                    ScrollView {
+                        Text(document.recipe.description)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity)
+                    }
                 }
+                .padding()
             }
         }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 
@@ -56,6 +53,6 @@ struct DescriptionView_SingleLine_Preview: PreviewProvider {
 struct DescriptionView_Empty_Preview: PreviewProvider {
     static var previews: some View {
         RecipeView()
-            .environmentObject(RecipeDocument.emptyRecipe)
+            .environmentObject(RecipeDocument.empty)
     }
 }

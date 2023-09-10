@@ -36,23 +36,9 @@ struct IngredientRow: View {
                 )
                 
                 // Measure Text Input
-                TextField("Measure",
-                    text: Binding(get: {
-                        measure
-                    }, set: { newValue in
-                        if let newMeasure = Float(newValue) {
-                            let oldMeasure = document.recipe.ingredients[index].measure
-                            document.recipe.ingredients[index].measure = newMeasure
-                            document.registerUndoMeasureChange(for: index, newMeasure: newMeasure, oldMeasure: oldMeasure, undoManager: undoManager)
-                            measure_valid = true
-                        } else {
-                            measure_valid = false
-                        }
-                        measure = newValue
-                    }),
-                    prompt: Text("measure")
-                )
-                .foregroundColor(measure_valid ? .accentColor : .red)
+                NumericTextField(title: "Measure", prompt: "measure", data: $document.recipe.ingredients[index].measure) {
+                    document.registerUndoMeasureChange(for: index, newMeasure: $0, oldMeasure: $1, undoManager: undoManager)
+                }
                 
                 //  Unit Input Field
                 TextField(

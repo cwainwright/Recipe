@@ -11,29 +11,29 @@ struct IngredientsView: View {
     @EnvironmentObject var document: RecipeDocument
     
     var body: some View {
-        VStack {
-            Text("Ingredients")
-                .font(.title3)
-                .frame(alignment: .leading)
-            if document.recipe.ingredients.count == 0 {
-                Text("There are no ingredients")
-                    .font(.footnote)
-                    .foregroundColor(.gray)
+        MaterialCard {
+            VStack {
+                Text("Ingredients")
+                    .font(.title3)
                     .frame(alignment: .leading)
-            } else {
-                Grid(alignment: .topLeading) {
-                    ForEach(document.recipe.ingredients, id: \.id) { ingredient in
-                        GridRow {
-                            Text(ingredient.toList())
+                if document.recipe.ingredients.count == 0 {
+                    Text("There are no ingredients")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                        .frame(alignment: .leading)
+                } else {
+                    Grid(alignment: .topLeading) {
+                        ForEach(document.recipe.ingredients, id: \.id) { ingredient in
+                            GridRow {
+                                Text(ingredient.toList())
+                            }
+                            .padding(.vertical, 1)
                         }
-                        .padding(.vertical, 1)
                     }
                 }
             }
+            .padding()
         }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 

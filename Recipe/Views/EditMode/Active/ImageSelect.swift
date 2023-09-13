@@ -49,7 +49,7 @@ struct ImageSelect_Previews: PreviewProvider {
     static var previews: some View {
         List {
             ImageSelect(showSheet: $showSheet)
-                .environmentObject(RecipeDocument.example)
         }
+        .environmentObject(RecipeDocument.example)
     }
 }

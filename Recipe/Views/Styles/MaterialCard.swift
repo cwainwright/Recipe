@@ -15,7 +15,7 @@ struct MaterialCard<Content: View>: View {
     
     var body: some View {
         VStack(content: content)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .background(.regularMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 8))
     }
@@ -23,17 +23,17 @@ struct MaterialCard<Content: View>: View {
 
 struct MaterialCard_Previews: PreviewProvider {
     static var previews: some View {
-        VStack {
+        PreviewBackground {
             MaterialCard {
                 Text("Hello World")
                     .padding()
             }
         }
-        .padding()
-        .background{
-            ZStack {
-                Image("food_example")
-                Rectangle().fill(.thinMaterial)
+        
+        PreviewBackground {
+            MaterialCard {
+                Text("This is a test of multiline support for a preview card.\nWith an extra line here!")
+                    .padding()
             }
         }
     }

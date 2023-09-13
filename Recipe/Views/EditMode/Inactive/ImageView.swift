@@ -20,27 +20,13 @@ struct ImageView: View {
                 VStack {
                     Spacer()
                     HStack(alignment: .center) {
-                        Spacer()
-                        switch(document.recipe.serves) {
-                        case 1:
-                            Image(systemName: "person")
-                        case 2:
-                            Image(systemName: "person.2")
-                        case 3:
-                            Image(systemName: "person.3")
-                        default:
-                            Image(systemName: "person.line.dotted.person")
-                        }
-                        Text("Serves: \(document.recipe.serves)")
-                        Spacer()
+                        ServesView()
+                            .frame(maxWidth: .infinity)
                         Divider()
-                            .frame(height: 30)
-                        Spacer()
-                        Image(systemName: "clock")
-                        Text("Time: \(document.recipe.duration_string)")
-                        Spacer()
+                        DurationView()
+                            .frame(maxWidth: .infinity)
                     }
-                    .frame(maxHeight: 50)
+                    .frame(maxWidth: .infinity, maxHeight: 50)
                     .background {
                         Rectangle().fill(.regularMaterial)
                     }
@@ -52,7 +38,10 @@ struct ImageView: View {
 
 struct ImageView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView()
-            .environmentObject(RecipeDocument.example)
+        PreviewBackground {
+            ImageView()
+        }
+        .environmentObject(RecipeDocument.example)
+        .previewDisplayName("Example")
     }
 }

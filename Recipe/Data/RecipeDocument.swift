@@ -8,6 +8,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 import EventKit
+import Combine
 
 extension UTType {
     static var exampleRecipe: UTType {
@@ -99,19 +100,8 @@ extension RecipeDocument {
 }
 
 
+
 extension RecipeDocument {
-    func registerUndoTextChange(target: Binding<String>, newValue: String, oldValue: String, undoManager: UndoManager? = nil) {
-        target.wrappedValue = newValue
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            target.wrappedValue = oldValue
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                target.wrappedValue = newValue
-            }
-        }
-    }
-    
     // Description Functions
     func registerUndoDescriptionChange(newDescription: String, oldDescription: String, undoManager: UndoManager? = nil) {
         

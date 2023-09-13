@@ -11,25 +11,16 @@ struct Active: View {
     @EnvironmentObject var document: RecipeDocument
     @Environment(\.undoManager) private var undoManager
     
-    var geometry: GeometryProxy
-    
     @State private var showImageSelector = false
     
     var body: some View {
         VStack {
             // Geometry is Portrait
-            if geometry.size.width <= geometry.size.height {
-                List {
-                    RecipeDetails(geometry: geometry)
-                    IngredientList()
-                    InstructionList()
-                    ImageSelect(showSheet: $showImageSelector)
-                }
-            } else {
+            ViewThatFits {
                 VStack {
                     HStack {
                         List {
-                            RecipeDetails(geometry: geometry)
+                            RecipeDetails()
                             ImageSelect(showSheet: $showImageSelector)
                         }
                         List {
@@ -37,6 +28,13 @@ struct Active: View {
                             InstructionList()
                         }
                     }
+                }
+                .frame(minWidth: 500)
+                List {
+                    RecipeDetails()
+                    IngredientList()
+                    InstructionList()
+                    ImageSelect(showSheet: $showImageSelector)
                 }
             }
         }
@@ -60,5 +58,21 @@ struct Active: View {
             }
             EditButton()
         }
+    }
+}
+
+struct Active_Preview: PreviewProvider {
+    static var previews: some View {
+        RecipeView()
+            .environment(\.editMode, Binding.constant(EditMode.active))
+            .environmentObject(RecipeDocument.example)
+    }
+}
+
+struct Active_Empty_Preview: PreviewProvider {
+    static var previews: some View {
+        RecipeView()
+            .environment(\.editMode, Binding.constant(EditMode.active))
+            .environmentObject(RecipeDocument.empty)
     }
 }

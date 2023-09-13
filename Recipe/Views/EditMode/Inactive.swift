@@ -12,35 +12,31 @@ struct Inactive: View {
     
     @EnvironmentObject var document: RecipeDocument
     
-    var geometry: GeometryProxy
-    
     @State private var showRemindersSheet: Bool = false
     let eventStore: EKEventStore = EKEventStore()
     
     var body: some View {
-        ScrollView {
-            VStack {
-                if geometry.size.width <= geometry.size.height {
-                    ImageView()
-                    DescriptionView()
-                    IngredientsView()
-                    InstructionsView()
-                } else {
-                    HStack {
+        GeometryReader { geometry in
+            ScrollView {
+                VStack {
+                    if geometry.size.width > 600 {
                         VStack {
-                            ImageView()
+                            HStack {
+                                ImageView()
+                                IngredientsView()
+                            }
+                            DescriptionView()
                             InstructionsView()
                         }
-                        .frame(maxWidth: .infinity)
-                        VStack {
-                            DescriptionView()
-                            IngredientsView()
-                        }
-                        .frame(maxWidth: .infinity)
+                    } else {
+                        ImageView()
+                        DescriptionView()
+                        IngredientsView()
+                        InstructionsView()
                     }
                 }
+                .padding()
             }
-            .padding()
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -77,7 +73,7 @@ struct Inactive: View {
                             print("Not Determined")
                         default:
                             print("Case Default")
-                        }
+                    }
                 }
         }
         .background(
@@ -95,18 +91,13 @@ struct Inactive: View {
 
 struct Inactive_Preview: PreviewProvider {
     static var previews: some View {
-        GeometryReader { geometry in
-            Inactive(geometry: geometry)
-                .environmentObject(RecipeDocument.example)
-        }
-    }
-}
-
-struct Inactive_Empty_Preview: PreviewProvider {
-    static var previews: some View {
-        GeometryReader { geometry in
-            Inactive(geometry: geometry)
+        RecipeView()
+            .environmentObject(RecipeDocument.example)
+            .previewInterfaceOrientation(.portrait)
+            .previewDisplayName("Example")
+        RecipeView()
             .environmentObject(RecipeDocument.empty)
-        }
+            .previewInterfaceOrientation(.portrait)
+            .previewDisplayName("Empty")
     }
 }

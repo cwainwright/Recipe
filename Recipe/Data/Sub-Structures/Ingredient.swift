@@ -51,10 +51,6 @@ extension Ingredient {
         }
         return "\(string_measure) \(ingredient)"
     }
-    
-    func toList() -> String {
-        "\u{2022} \(toString())"
-    }
 }
 
 // export to reminders

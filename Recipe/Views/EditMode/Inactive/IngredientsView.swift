@@ -12,20 +12,20 @@ struct IngredientsView: View {
     
     var body: some View {
         MaterialCard {
-            VStack {
+            VStack(alignment: .leading) {
                 Text("Ingredients")
-                    .font(.title3)
-                    .frame(alignment: .leading)
+                    .font(.title2)
                 if document.recipe.ingredients.count == 0 {
                     Text("There are no ingredients")
                         .font(.footnote)
                         .foregroundColor(.gray)
-                        .frame(alignment: .leading)
                 } else {
-                    Grid(alignment: .topLeading) {
+                    VStack(alignment: .listRowSeparatorLeading) {
                         ForEach(document.recipe.ingredients, id: \.id) { ingredient in
-                            GridRow {
-                                Text(ingredient.toList())
+                            HStack (alignment: .firstTextBaseline){
+                                Text("\u{2022} ")
+                                Text(ingredient.toString())
+                                    .multilineTextAlignment(.leading)
                             }
                             .padding(.vertical, 1)
                         }
@@ -39,12 +39,16 @@ struct IngredientsView: View {
 
 struct Ingredients_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView()
-            .environmentObject(RecipeDocument(
-                description: "A Description",
-                ingredients: Ingredient.example,
-                instructions: [],
-                utensils: []
-            ))
+        PreviewBackground {
+            IngredientsView()
+        }
+        .environmentObject(RecipeDocument.example)
+        .previewDisplayName("Example")
+        
+        PreviewBackground {
+            IngredientsView()
+        }
+        .environmentObject(RecipeDocument.empty)
+        .previewDisplayName("Empty")
     }
 }

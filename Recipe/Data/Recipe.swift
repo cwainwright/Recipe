@@ -17,9 +17,7 @@ struct Recipe {
     var instructions: Array<Instruction>
     var ingredients: Array<Ingredient>
     var utensils: Array<Utensil>
-}
-
-extension Recipe {
+    
     enum defaults {
         static let description: String = ""
         static let duration: Int = 30
@@ -78,24 +76,47 @@ extension Recipe {
 // Serves and Duration Computed Properties
 extension Recipe {
     var serves_string: String {
-        switch serves{
+        return "\(serves) \(serves > 1 ? "people" : "person")"
+    }
+    
+    var serves_image: String {
+        switch(serves) {
         case 1:
-            return "\(serves) person"
+            return "person"
+        case 2:
+            return "person.2"
+        case 3:
+            return "person.3"
         default:
-            return "\(serves) people"
+            return "person.line.dotted.person"
         }
     }
     
     var duration_string: String {
-        let mins = duration%60 > 1 ? "mins" : "min"
-        let hours = Int(duration/60) > 1 ? "hours" : "hour"
+        let hours = Int(duration/60)
+        let hours_str = "\(hours)" + (hours > 1 ? " hours" : " hour")
         
-        if duration < 60 {
-            return "\(duration) \(mins)"
-        } else if duration % 60 == 0 {
-            return "\(Int(duration/60)) \(hours)"
-        } else {
-            return "\(Int(duration/60)) \(hours), \(duration%60) \(mins)"
+        let mins = duration % 60
+        let mins_str = "\(mins)" + (mins > 1 ? " mins" : " min")
+        
+        return (hours != 0 ? hours_str : "") + (hours != 0 && mins != 0 ? ", " : "") + (mins != 0 ? mins_str : "")
+    }
+    
+    var duration_mins: String {
+        let mins = duration%60
+        let mins_str = "\(mins)" + (mins > 1 ? "mins" : "min")
+        
+        return mins_str
+    }
+    
+    var duration_hours: String {
+        let hours = Int(duration/60)
+        let hours_str = "\(hours)" + (hours > 1 ? "hours" : "hour")
+        let mins = duration%60
+        
+        if hours == 0 {
+            return ""
         }
+        return hours_str + (mins != 0 ? ",\n" : "")
     }
 }

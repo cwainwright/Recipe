@@ -14,14 +14,21 @@ struct RecipeView: View {
     @Environment(\.undoManager) private var undoManager
     
     var body: some View {
-        GeometryReader { geometry in
-            VStack {
-                if editMode?.wrappedValue == .active {
-                    Active(geometry: geometry)
-                } else {
-                    Inactive(geometry: geometry)
-                }
-            }
+        if editMode?.wrappedValue == .active {
+            Active()
+        } else {
+            Inactive()
         }
+    }
+}
+struct ExampleRecipeView_Previews: PreviewProvider {
+    static var previews: some View {
+            RecipeView()
+                .environmentObject(RecipeDocument.example)
+                .previewDisplayName("View")
+            RecipeView()
+                .environmentObject(RecipeDocument.example)
+                .environment(\.editMode, Binding.constant(EditMode.active))
+                .previewDisplayName("Edit")
     }
 }

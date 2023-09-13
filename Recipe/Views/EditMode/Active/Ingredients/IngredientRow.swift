@@ -54,9 +54,5 @@ struct IngredientRow: View {
                 .textInputAutocapitalization(.never)
             }
         }
-        .onAppear {
-            // Set initial value of measure (which can be edited like a string)
-            measure = String(ingredient.measure)
-        }
     }
 }

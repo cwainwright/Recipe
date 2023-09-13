@@ -13,8 +13,6 @@ struct RecipeDetails: View {
     @Environment(\.editMode) private var editMode
     @Environment(\.undoManager) var undoManager
     
-    var geometry: GeometryProxy
-    
     var body: some View {
         Section("Details") {
             TextEditor(text: Binding(
@@ -27,25 +25,60 @@ struct RecipeDetails: View {
                     document.registerUndoDescriptionChange(newDescription: newDescription, oldDescription: oldDescription, undoManager: undoManager)
                 }
             ))
-            .frame(minHeight: 100, maxHeight: .infinity)
-            if geometry.size.width <= geometry.size.height {
-                HStack {
-                    ServesStepper()
-                    Spacer()
-                    Divider()
-                    Spacer()
-                    DurationStepper()
+            .frame(height: 250)
+            HStack {
+                VStack {
+                    ViewThatFits {
+                        Text("Serves: \(document.recipe.serves_string)")
+                        Text("Serves:\n\(document.recipe.serves_string)")
+                    }
+                    Stepper(value: Binding(
+                        get: {
+                            document.recipe.serves
+                        },
+                        set: {newValue in
+                            let oldValue = document.recipe.serves
+                            document.registerUndoServesChange(oldValue: oldValue, newValue: newValue, undoManager: undoManager)
+                            document.recipe.serves = newValue
+                        }
+                    ), in: 1...50, step: 1) {
+                        Text("Serves: \(document.recipe.serves_string)")
+                    }
+                    .labelsHidden()
                 }
-            } else {
-                ServesStepper()
-                DurationStepper()
+                Spacer()
+                Divider()
+                Spacer()
+                VStack {
+                    ViewThatFits {
+                        Text("Duration: \(document.recipe.duration_string)")
+                        Text("Duration:\n\(document.recipe.duration_string)")
+                        Text("Duration:\n\(document.recipe.duration_hours)\(document.recipe.duration_mins)")
+                    }
+                    Stepper(value: Binding(
+                        get: {
+                            document.recipe.duration
+                        },
+                        set: {newValue in
+                            let oldValue = document.recipe.duration
+                            document.registerUndoDurationChange(oldValue: oldValue, newValue: newValue, undoManager: undoManager)
+                            document.recipe.duration = newValue
+                        }
+                    ), in: 1...720, step: 1) {
+                        Text("Duration: \(document.recipe.duration_string)")
+                    }
+                    .labelsHidden()
+                }
             }
         }
     }
 }
-//
-//struct DescriptionField_Previews: PreviewProvider {
-//    static var previews: some View {
-//        EditDescription()
-//    }
-//}
+
+struct RecipeDetails_Previews: PreviewProvider {
+    static var previews: some View {
+        List {
+            RecipeDetails()
+        }
+        .environmentObject(RecipeDocument.example)
+    }
+}

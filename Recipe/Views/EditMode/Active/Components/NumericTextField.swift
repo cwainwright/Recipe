@@ -11,8 +11,8 @@ protocol StringInitialisable {
     init?(_ _: String)
 }
 
-extension Float: StringInitialisable {}
 extension Int: StringInitialisable {}
+extension Float: StringInitialisable {}
 extension Double: StringInitialisable {}
 
 struct NumericTextField<T: Equatable & StringInitialisable>: View {
@@ -41,9 +41,6 @@ struct NumericTextField<T: Equatable & StringInitialisable>: View {
             }),
             prompt: Text(prompt)
         )
-        .onChange(of: data) { newValue in
-            text = "\(newValue)"
-        }
         .foregroundColor(valid ? .accentColor : .red)
         .onAppear {
             // Set initial value of data

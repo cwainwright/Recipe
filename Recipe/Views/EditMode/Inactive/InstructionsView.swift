@@ -11,61 +11,65 @@ struct InstructionsView: View {
     @EnvironmentObject var document: RecipeDocument
     
     var body: some View {
-        VStack {
-            Text("Instructions")
-                .font(.title3)
-            if document.recipe.instructions.count == 0 {
-                Text("There are no instructions")
-                    .font(.footnote)
-                    .foregroundColor(.gray)
-            } else {
-                Grid(alignment: .topLeading) {
-                    ForEach(Array(document.recipe.instructions.enumerated()), id: \.1.id) { index, instruction in
-                        GridRow {
-                            Text("\(index+1).")
-                            Text(instruction.instruction)
+        MaterialCard {
+            VStack(alignment: .leading) {
+                Text("Instructions")
+                    .font(.title2)
+                if document.recipe.instructions.count == 0 {
+                    Text("There are no instructions")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                } else {
+                    Grid(alignment: .topLeading) {
+                        ForEach(Array(document.recipe.instructions.enumerated()), id: \.1.id) { index, instruction in
+                            GridRow(alignment: .firstTextBaseline) {
+                                Text("\(index+1).")
+                                Text(instruction.instruction)
+                                    .multilineTextAlignment(.leading)
+                            }
+                            .padding(.vertical, 1)
                         }
-                        .padding(.vertical, 1)
                     }
                 }
             }
+            .padding()
         }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 
-struct InstructionsView_Single_Previews: PreviewProvider {
+struct InstructionsView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView()
-            .environmentObject(RecipeDocument(
-                instructions: Instruction.single
-            ))
-    }
-}
-
-struct InstructionsView_Multiple_Previews: PreviewProvider {
-    static var previews: some View {
-        RecipeView()
-            .environmentObject(RecipeDocument(
-                instructions: Instruction.multiple
-            ))
-    }
-}
-
-struct InstructionsView_Multiline_Previews: PreviewProvider {
-    static var previews: some View {
-        RecipeView()
-            .environmentObject(RecipeDocument(
-                instructions: Instruction.multiline
-            ))
-    }
-}
-
-struct InstructionsView_Empty_Previews: PreviewProvider {
-    static var previews: some View {
-        RecipeView()
-            .environmentObject(RecipeDocument.emptyRecipe)
+        PreviewBackground {
+            InstructionsView()
+        }
+        .environmentObject(RecipeDocument(
+            instructions: Instruction.single
+        ))
+        .previewDisplayName("Single")
+        
+        PreviewBackground {
+            InstructionsView()
+        }
+        .environmentObject(RecipeDocument(
+            instructions: Instruction.multiple
+        ))
+        .previewDisplayName("Multiple")
+        
+        PreviewBackground {
+            ScrollView(.horizontal) {
+                InstructionsView()
+            }
+        }
+        .environmentObject(RecipeDocument(
+            instructions: Instruction.multiline
+        ))
+        .previewDisplayName("Multiline")
+        
+        PreviewBackground {
+            InstructionsView()
+        }
+        .environmentObject(RecipeDocument.empty)
+        .previewDisplayName("Empty")
+        
     }
 }

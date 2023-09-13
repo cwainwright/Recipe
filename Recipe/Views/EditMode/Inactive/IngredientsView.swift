@@ -11,40 +11,44 @@ struct IngredientsView: View {
     @EnvironmentObject var document: RecipeDocument
     
     var body: some View {
-        VStack {
-            Text("Ingredients")
-                .font(.title3)
-                .frame(alignment: .leading)
-            if document.recipe.ingredients.count == 0 {
-                Text("There are no ingredients")
-                    .font(.footnote)
-                    .foregroundColor(.gray)
-                    .frame(alignment: .leading)
-            } else {
-                Grid(alignment: .topLeading) {
-                    ForEach(document.recipe.ingredients, id: \.id) { ingredient in
-                        GridRow {
-                            Text(ingredient.toList())
+        MaterialCard {
+            VStack(alignment: .leading) {
+                Text("Ingredients")
+                    .font(.title2)
+                if document.recipe.ingredients.count == 0 {
+                    Text("There are no ingredients")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                } else {
+                    VStack(alignment: .listRowSeparatorLeading) {
+                        ForEach(document.recipe.ingredients, id: \.id) { ingredient in
+                            HStack (alignment: .firstTextBaseline){
+                                Text("\u{2022} ")
+                                Text(ingredient.toString())
+                                    .multilineTextAlignment(.leading)
+                            }
+                            .padding(.vertical, 1)
                         }
-                        .padding(.vertical, 1)
                     }
                 }
             }
+            .padding()
         }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 
 struct Ingredients_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView()
-            .environmentObject(RecipeDocument(
-                description: "A Description",
-                ingredients: Ingredient.example,
-                instructions: [],
-                utensils: []
-            ))
+        PreviewBackground {
+            IngredientsView()
+        }
+        .environmentObject(RecipeDocument.example)
+        .previewDisplayName("Example")
+        
+        PreviewBackground {
+            IngredientsView()
+        }
+        .environmentObject(RecipeDocument.empty)
+        .previewDisplayName("Empty")
     }
 }

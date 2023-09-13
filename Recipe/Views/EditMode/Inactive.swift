@@ -11,18 +11,32 @@ import EventKit
 struct Inactive: View {
     
     @EnvironmentObject var document: RecipeDocument
-    @State var showRemindersSheet: Bool = false
     
+    @State private var showRemindersSheet: Bool = false
     let eventStore: EKEventStore = EKEventStore()
     
     var body: some View {
-        ScrollView {
-            VStack {
-                DescriptionView()
-                IngredientsView()
-                InstructionsView()
+        GeometryReader { geometry in
+            ScrollView {
+                VStack {
+                    if geometry.size.width > 600 {
+                        VStack {
+                            HStack {
+                                ImageView()
+                                IngredientsView()
+                            }
+                            DescriptionView()
+                            InstructionsView()
+                        }
+                    } else {
+                        ImageView()
+                        DescriptionView()
+                        IngredientsView()
+                        InstructionsView()
+                    }
+                }
+                .padding()
             }
-            .padding([.horizontal, .bottom])
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -59,32 +73,31 @@ struct Inactive: View {
                             print("Not Determined")
                         default:
                             print("Case Default")
-                        }
+                    }
                 }
         }
-        .navigationBarTitleDisplayMode(.automatic)
         .background(
             ZStack {
                 Image(uiImage: document.image)
-                    .ignoresSafeArea(.all)
+                    .resizable()
                     .scaledToFill()
                 Rectangle()
-                    .fill(.regularMaterial)
+                    .fill(.thinMaterial)
             }
+            .ignoresSafeArea()
         )
     }
 }
 
 struct Inactive_Preview: PreviewProvider {
     static var previews: some View {
-        Inactive()
-            .environmentObject(RecipeDocument.exampleRecipe)
-    }
-}
-
-struct Inactive_Empty_Preview: PreviewProvider {
-    static var previews: some View {
-        Inactive()
-            .environmentObject(RecipeDocument.emptyRecipe)
+        RecipeView()
+            .environmentObject(RecipeDocument.example)
+            .previewInterfaceOrientation(.portrait)
+            .previewDisplayName("Example")
+        RecipeView()
+            .environmentObject(RecipeDocument.empty)
+            .previewInterfaceOrientation(.portrait)
+            .previewDisplayName("Empty")
     }
 }

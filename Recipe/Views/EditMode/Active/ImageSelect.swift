@@ -13,36 +13,43 @@ struct ImageSelect: View {
     @EnvironmentObject var document: RecipeDocument
     
     var body: some View {
-        Button {
-            showSheet.toggle()
-        } label: {
-            VStack(alignment: .center) {
-                Image(systemName: "photo")
-                Text("Select Photo")
-            }
-            .frame(maxWidth: .infinity)
-            .background(
+        Section("Image") {
+            MaterialCard {
                 ZStack {
                     Image(uiImage: document.image)
+                        .resizable()
                         .scaledToFill()
-                    Rectangle()
-                        .fill(.regularMaterial)
+                    VStack {
+                        Button {
+                            showSheet.toggle()
+                        } label: {
+                            VStack(alignment: .center) {
+                                Image(systemName: "photo")
+                                Text("Select Photo")
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding([.vertical], 3)
+                        .background {
+                            Rectangle().fill(
+                                .regularMaterial
+                            )
+                        }
+                        Spacer()
+                    }
                 }
-            )
+            }
+            .padding([.vertical], 4)
         }
-        .frame(idealHeight: 50)
-        Image(uiImage: document.image)
-            .resizable()
-            .scaledToFill()
-            .cornerRadius(5)
-            .padding()
     }
 }
 
 struct ImageSelect_Previews: PreviewProvider {
     @State static var showSheet: Bool = false
     static var previews: some View {
-        ImageSelect(showSheet: $showSheet)
-            .environmentObject(RecipeDocument.exampleRecipe)
+        List {
+            ImageSelect(showSheet: $showSheet)
+        }
+        .environmentObject(RecipeDocument.example)
     }
 }

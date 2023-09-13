@@ -15,9 +15,20 @@ struct RecipeView: View {
     
     var body: some View {
         if editMode?.wrappedValue == .active {
-            Active().environmentObject(document)
+            Active()
         } else {
-            Inactive().environmentObject(document)
+            Inactive()
         }
+    }
+}
+struct ExampleRecipeView_Previews: PreviewProvider {
+    static var previews: some View {
+            RecipeView()
+                .environmentObject(RecipeDocument.example)
+                .previewDisplayName("View")
+            RecipeView()
+                .environmentObject(RecipeDocument.example)
+                .environment(\.editMode, Binding.constant(EditMode.active))
+                .previewDisplayName("Edit")
     }
 }

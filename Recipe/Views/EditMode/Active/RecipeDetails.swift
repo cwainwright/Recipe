@@ -51,9 +51,9 @@ struct RecipeDetails: View {
                 Spacer()
                 VStack {
                     ViewThatFits {
-                        Text("Duration: \(document.recipe.duration_string)")
-                        Text("Duration:\n\(document.recipe.duration_string)")
-                        Text("Duration:\n\(document.recipe.duration_hours)\(document.recipe.duration_mins)")
+                        Text("Duration: \(document.recipe.durationString)")
+                        Text("Duration:\n\(document.recipe.durationString)")
+                        Text("Duration:\n\(document.recipe.durationHoursString)\(document.recipe.durationMinsString)")
                     }
                     Stepper(value: Binding(
                         get: {
@@ -65,7 +65,7 @@ struct RecipeDetails: View {
                             document.recipe.duration = newValue
                         }
                     ), in: 1...720, step: 1) {
-                        Text("Duration: \(document.recipe.duration_string)")
+                        Text("Duration: \(document.recipe.durationString)")
                     }
                     .labelsHidden()
                 }

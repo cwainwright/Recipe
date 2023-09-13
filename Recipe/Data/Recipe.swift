@@ -66,7 +66,7 @@ extension Recipe {
         Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
         Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         """,
-        duration: 30, serves: 4,
+        duration: defaults.duration, serves: defaults.serves,
         instructions: Instruction.example,
         ingredients: Ingredient.example,
         utensils: Utensil.example
@@ -92,7 +92,7 @@ extension Recipe {
         }
     }
     
-    var duration_string: String {
+    var durationString: String {
         let hours = Int(duration/60)
         let hours_str = "\(hours)" + (hours > 1 ? " hours" : " hour")
         
@@ -102,14 +102,14 @@ extension Recipe {
         return (hours != 0 ? hours_str : "") + (hours != 0 && mins != 0 ? ", " : "") + (mins != 0 ? mins_str : "")
     }
     
-    var duration_mins: String {
+    var durationMinsString: String {
         let mins = duration%60
         let mins_str = "\(mins)" + (mins > 1 ? "mins" : "min")
         
         return mins_str
     }
     
-    var duration_hours: String {
+    var durationHoursString: String {
         let hours = Int(duration/60)
         let hours_str = "\(hours)" + (hours > 1 ? "hours" : "hour")
         let mins = duration%60

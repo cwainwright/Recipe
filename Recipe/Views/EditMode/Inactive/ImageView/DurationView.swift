@@ -14,17 +14,17 @@ struct DurationView: View {
         ViewThatFits(in: .horizontal) {
             HStack {
                 Image(systemName: "clock")
-                Text("Time: \(document.recipe.duration_string)")
+                Text("Time: \(document.recipe.durationString)")
             }
             VStack {
                 Image(systemName: "clock")
-                Text("Time: \(document.recipe.duration_string)")
+                Text("Time: \(document.recipe.durationString)")
             }
             VStack {
                 Image(systemName: "clock")
-                Text(document.recipe.duration_string)
+                Text(document.recipe.durationString)
             }
-            Text(document.recipe.duration_string)
+            Text(document.recipe.durationString)
         }
     }
 }

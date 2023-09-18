@@ -19,7 +19,7 @@ struct NumericTextField<T: Equatable & StringInitialisable>: View {
     let title: String
     let prompt: String
     @Binding var data: T
-    let update: (T, T) -> Void
+    let update: (T) -> Void
     
     @State var text: String = ""
     @State var valid: Bool = true
@@ -32,7 +32,7 @@ struct NumericTextField<T: Equatable & StringInitialisable>: View {
                 if let newData = T.init(newValue) {
                     let oldData = data
                     data = newData
-                    update(oldData, newData)
+                    update(newData)
                     valid = true
                 } else {
                     valid = false

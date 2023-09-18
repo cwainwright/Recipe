@@ -21,10 +21,10 @@ struct InstructionsView: View {
                         .foregroundColor(.gray)
                 } else {
                     Grid(alignment: .topLeading) {
-                        ForEach(Array(document.recipe.instructions.enumerated()), id: \.1.id) { index, instruction in
+                        ForEach(document.recipe.instructions, id: \.id) { instruction in
                             GridRow(alignment: .firstTextBaseline) {
-                                Text("\(index+1).")
-                                Text(instruction.instruction)
+                                Text("\((document.recipe.instructions.firstIndex(of: instruction) ?? 0)+1).")
+                                Text(instruction.detail)
                                     .multilineTextAlignment(.leading)
                             }
                             .padding(.vertical, 1)

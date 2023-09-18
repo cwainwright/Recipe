@@ -10,7 +10,7 @@ import EventKit
 
 struct Ingredient: Codable, Identifiable {
     var id: UUID = UUID()
-    var ingredient: String
+    var name: String
     var measure: Float
     var unit: String
     
@@ -22,7 +22,7 @@ struct Ingredient: Codable, Identifiable {
 // default initialiser
 extension Ingredient {
     init() {
-        self.ingredient = ""
+        self.name = ""
         self.unit = ""
         self.measure = 0.0
     }
@@ -47,9 +47,9 @@ extension Ingredient {
         }
         // if unit is not empty
         if self.hasUnit {
-            return "\(string_measure) \(unit) of \(ingredient)"
+            return "\(string_measure) \(unit) of \(name)"
         }
-        return "\(string_measure) \(ingredient)"
+        return "\(string_measure) \(name)"
     }
 }
 
@@ -70,9 +70,9 @@ extension Ingredient {
 // example array
 extension Ingredient {
     static var example: Array<Ingredient> = [
-        Ingredient(ingredient: "Apples", measure: 2, unit: ""),
-        Ingredient(ingredient: "Flour", measure: 500, unit: "g"),
-        Ingredient(ingredient: "Butter", measure: 50, unit: "g"),
-        Ingredient(ingredient: "Sugar", measure: 250, unit: "g")
+        Ingredient(name: "Apples", measure: 2, unit: ""),
+        Ingredient(name: "Flour", measure: 500, unit: "g"),
+        Ingredient(name: "Butter", measure: 50, unit: "g"),
+        Ingredient(name: "Sugar", measure: 250, unit: "g")
     ]
 }

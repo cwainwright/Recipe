@@ -32,8 +32,8 @@ struct Recipe {
 extension Recipe {
     init() {
         self.description = defaults.description
-        self.duration = defaults.serves
-        self.serves = defaults.duration
+        self.duration = defaults.duration
+        self.serves = defaults.serves
         self.instructions = defaults.instructions
         self.ingredients = defaults.ingredients
         self.utensils = defaults.utensils

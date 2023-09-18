@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct InstructionRow: View {
-    @Environment(\.undoManager) var undoManager
     @EnvironmentObject var document: RecipeDocument
     
     @State var index: Int
@@ -19,11 +18,9 @@ struct InstructionRow: View {
                 Text("\(index+1)")
                 TextField("Instruction",
                     text: Binding(get: {
-                        document.recipe.instructions[index].instruction
+                        document.recipe.instructions[index].detail
                     }, set: { newValue in
-                        let oldValue = document.recipe.instructions[index].instruction
-                        document.recipe.instructions[index].instruction = newValue
-                        document.registerUndoInstructionChange(for: index, newInstruction: newValue, oldInstruction: oldValue, undoManager: undoManager)
+                        document.setInstructionDetail(of: index, to: newValue)
                     }),
                     prompt: Text("Instruction"))
             }

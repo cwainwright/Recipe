@@ -10,12 +10,15 @@ import SwiftUI
 struct RecipeView: View {
     @EnvironmentObject var document: RecipeDocument
     
-    @Environment(\.editMode) private var editMode
     @Environment(\.undoManager) private var undoManager
+    @Environment(\.editMode) private var editMode
     
     var body: some View {
         if editMode?.wrappedValue == .active {
             Active()
+                .onAppear {
+                    document.registerUndoManager(undoManager)
+                }
         } else {
             Inactive()
         }

@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct InstructionList: View {
-    @Environment(\.undoManager) private var undoManager
     @EnvironmentObject var document: RecipeDocument
     
     var body: some View {
@@ -16,12 +15,12 @@ struct InstructionList: View {
             ForEach(Array(document.recipe.instructions.indices), id: \.self) { index in
                 InstructionRow(index: index)
             }
-            .onDelete { document.deleteInstructions(offsets: $0, undoManager: undoManager) }
-            .onMove { document.moveInstructionsAt(offsets: $0, toOffset: $1, undoManager: undoManager)}
+            .onDelete(perform: document.deleteInstructions)
+            .onMove(perform: document.moveInstructions)
             
             Button("Add Instruction") {
                 withAnimation {
-                    document.addInstruction(instruction: Instruction(), undoManager: undoManager)
+                    document.appendInstruction(Instruction())
                 }
             }
         }

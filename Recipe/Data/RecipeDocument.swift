@@ -22,6 +22,12 @@ final class RecipeDocument: ReferenceFileDocument {
     
     @Published var recipe: Recipe
     @Published var image: UIImage = UIImage(named: "food_example")!
+    
+    var undoManager: UndoManager? = nil
+    
+    func registerUndoManager(_ newUndoManager: UndoManager?) {
+        if undoManager == nil { undoManager = newUndoManager }
+    }
 
     static var readableContentTypes: [UTType] { [.exampleRecipe] }
     
@@ -29,6 +35,7 @@ final class RecipeDocument: ReferenceFileDocument {
         // return a copy of recipe object
         (recipe, image)
     }
+    
     
     init() {
         // produce example recipe
@@ -99,330 +106,209 @@ extension RecipeDocument {
     )
 }
 
-
+extension RecipeDocument {
+    // Document Metadata
+    func setDescription(to newValue: String) {
+        let oldValue = recipe.description
+        
+        recipe.description = newValue
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.setDescription(to: oldValue)
+        }
+    }
+    
+    func setServes(to newValue: Int) {
+        let oldValue = recipe.serves
+        
+        recipe.serves = newValue
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.setServes(to: oldValue)
+        }
+    }
+    
+    func setDuration(to newValue: Int) {
+        let oldValue = recipe.duration
+        
+        recipe.duration = newValue
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.setDuration(to: oldValue)
+        }
+    }
+    
+    func setImage(to newValue: UIImage) {
+        let oldValue = image
+        
+        image = newValue
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.setImage(to: oldValue)
+        }
+    }
+}
 
 extension RecipeDocument {
-    // Description Functions
-    func registerUndoDescriptionChange(newDescription: String, oldDescription: String, undoManager: UndoManager? = nil) {
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.recipe.description = oldDescription
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.recipe.description = newDescription
-            }
-        }
-    }
-
-    // Serves Functions
-    func registerUndoServesChange(oldValue: Int, newValue: Int, undoManager: UndoManager? = nil) {
-
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.recipe.serves = oldValue
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.recipe.serves = newValue
-            }
-        }
-    }
-
-    // Image Functions
-    func registerUndoImageChange(newImage: UIImage, undoManager: UndoManager? = nil) {
-        let oldImage = self.image
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.image = oldImage
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.image = newImage
-            }
-        }
-    }
-    
-    // Metadata Functions
-    func registerUndoDurationChange(oldValue: Int, newValue: Int, undoManager: UndoManager? = nil) {
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.recipe.duration = oldValue
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.recipe.duration = newValue
-            }
-        }
-    }
-
     // Ingredient Functions
-    func addIngredient(ingredient: Ingredient, undoManager: UndoManager? = nil) {
-        recipe.ingredients.append(Ingredient())
-        let count = recipe.ingredients.count
-        undoManager?.registerUndo(withTarget: self) { doc in
-            withAnimation {
-                doc.deleteIngredient(index: count - 1, undoManager: undoManager)
-            }
-        }
-    }
-    
-    func deleteIngredient(index: Int, undoManager: UndoManager? = nil) {
-        let oldItems = recipe.ingredients
-        withAnimation {
-            _ = recipe.ingredients.remove(at: index)
-        }
+    func setIngredientName(of index: Int, to newValue: String) {
+        let oldValue = recipe.ingredients[index].name
+        
+        recipe.ingredients[index].name = newValue
         
         undoManager?.registerUndo(withTarget: self) { doc in
-            doc.replaceIngredients(with: oldItems, undoManager: undoManager)
+            doc.setIngredientName(of: index, to: oldValue)
         }
     }
     
-    func replaceIngredients(with newIngredients: [Ingredient], undoManager: UndoManager? = nil, animation: Animation? = .default) {
+    func setIngredientUnit(of index: Int, to newValue: String) {
+        let oldValue = recipe.ingredients[index].unit
+        
+        recipe.ingredients[index].unit = newValue
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.setIngredientUnit(of: index, to: oldValue)
+        }
+    }
+    
+    func setIngredientMeasure(of index: Int, to newValue: Float) {
+        let oldValue = recipe.ingredients[index].measure
+        
+        recipe.ingredients[index].measure = newValue
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.setIngredientMeasure(of: index, to: oldValue)
+        }
+    }
+    
+    // Array<Ingredient> Functions
+    func appendIngredient(_ newIngredient: Ingredient) {
+        let oldCount = recipe.ingredients.count
+        
+        recipe.ingredients.append(newIngredient)
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.deleteIngredient(at: oldCount)
+        }
+    }
+    
+    func insertIngredient(_ newIngredient: Ingredient, at i: Int) {
+        recipe.ingredients.insert(newIngredient, at: i)
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.deleteIngredient(at: i)
+        }
+    }
+    
+    func deleteIngredient(at index: Int) {
+        let oldIngredient = recipe.ingredients[index]
+        
+        recipe.ingredients.remove(at: index)
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.insertIngredient(oldIngredient, at: index)
+        }
+    }
+    
+    func deleteIngredients(atOffsets offsets: IndexSet) {
         let oldIngredients = recipe.ingredients
         
-        withAnimation(animation) {
-            recipe.ingredients = newIngredients
-        }
+        recipe.ingredients.remove(atOffsets: offsets)
         
         undoManager?.registerUndo(withTarget: self) { doc in
-            doc.replaceIngredients(with: oldIngredients, undoManager: undoManager, animation: animation)
+            doc.replaceIngredients(with: oldIngredients)
         }
     }
-
-    func deleteIngredients(offsets: IndexSet, undoManager: UndoManager? = nil) {
+    
+    func moveIngredients(fromOffsets: IndexSet, toOffset: Int) {
         let oldIngredients = recipe.ingredients
-        withAnimation {
-            recipe.ingredients.remove(atOffsets: offsets)
-        }
-
+        
+        recipe.ingredients.move(fromOffsets: fromOffsets, toOffset: toOffset)
+        
         undoManager?.registerUndo(withTarget: self) { doc in
-            doc.replaceIngredients(with: oldIngredients, undoManager: undoManager)
+            doc.replaceIngredients(with: oldIngredients)
         }
     }
     
-    func moveIngredientsAt(offsets: IndexSet, toOffset: Int, undoManager: UndoManager? = nil) {
+    func replaceIngredients(with newIngredients: Array<Ingredient>) {
         let oldIngredients = recipe.ingredients
-        withAnimation {
-            recipe.ingredients.move(fromOffsets: offsets, toOffset: toOffset)
-        }
+        
+        recipe.ingredients = newIngredients
         
         undoManager?.registerUndo(withTarget: self) { doc in
-            // Use the replaceItems symmetric undoable-redoable function.
-            doc.replaceIngredients(with: oldIngredients, undoManager: undoManager)
-        }
-        
-    }
-    
-    func registerUndoMeasureChange(for index: Int, newMeasure: Float, oldMeasure: Float, undoManager: UndoManager?) {
-        
-        let newIngredients = recipe.ingredients
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.recipe.ingredients[index].measure = oldMeasure
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.replaceIngredients(with: newIngredients, undoManager: undoManager, animation: nil)
-            }
+            doc.replaceIngredients(with: oldIngredients)
         }
     }
-    
-    func registerUndoUnitChange(for index: Int, newUnit: String, oldUnit: String, undoManager: UndoManager?) {
-        
-        let newIngredients = recipe.ingredients
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.recipe.ingredients[index].unit = oldUnit
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.replaceIngredients(with: newIngredients, undoManager: undoManager, animation: nil)
-            }
-        }
-    }
-    
-    func registerUndoIngredientChange(for index: Int, newIngredient: String, oldIngredient: String, undoManager: UndoManager?) {
-        let newIngredients = recipe.ingredients
-        
-        recipe.ingredients[index].ingredient = newIngredient
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.recipe.ingredients[index].ingredient = oldIngredient
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.replaceIngredients(with: newIngredients, undoManager: undoManager, animation: nil)
-            }
-        }
-    }
+}
 
-    // Instruction Functions
-    func addInstruction(instruction: Instruction, undoManager: UndoManager? = nil) {
-        recipe.instructions.append(instruction)
-        let count = recipe.instructions.count
-        undoManager?.registerUndo(withTarget: self) { doc in
-            withAnimation {
-                doc.deleteInstruction(index: count - 1, undoManager: undoManager)
-            }
-        }
-    }
-    
-    func deleteInstruction(index: Int, undoManager: UndoManager? = nil) {
-        let oldInstructions = recipe.instructions
-        withAnimation {
-            _ = recipe.instructions.remove(at: index)
-        }
+extension RecipeDocument {
+    // Ingredient Functions
+    func setInstructionDetail(of index: Int, to newValue: String) {
+        let oldValue = recipe.instructions[index].detail
+        
+        recipe.instructions[index].detail = newValue
         
         undoManager?.registerUndo(withTarget: self) { doc in
-            doc.replaceInstructions(with: oldInstructions, undoManager: undoManager)
+            doc.setInstructionDetail(of: index, to: oldValue)
         }
     }
     
-    func deleteInstructionIDs(withIDs ids: [UUID], undoManager: UndoManager? = nil) {
-        var indexSet: IndexSet = IndexSet()
-
-        let enumerated = recipe.instructions.enumerated()
-        for (index, item) in enumerated where ids.contains(item.id) {
-            indexSet.insert(index)
+    // Array<Instruction> Functions
+    func appendInstruction(_ newInstruction: Instruction) {
+        let oldCount = recipe.instructions.count
+        
+        recipe.instructions.append(newInstruction)
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.deleteInstruction(at: oldCount)
         }
-
-        deleteInstructions(offsets: indexSet, undoManager: undoManager)
     }
     
-    func replaceInstructions(with newInstructions: [Instruction], undoManager: UndoManager? = nil, animation: Animation? = .default) {
+    func insertInstruction(_ newInstruction: Instruction, at i: Int) {
+        recipe.instructions.insert(newInstruction, at: i)
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.deleteInstruction(at: i)
+        }
+    }
+    
+    func deleteInstruction(at index: Int) {
+        let oldInstruction = recipe.instructions[index]
+        
+        recipe.instructions.remove(at: index)
+        
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.insertInstruction(oldInstruction, at: index)
+        }
+    }
+    
+    func deleteInstructions(atOffsets offsets: IndexSet) {
         let oldInstructions = recipe.instructions
         
-        withAnimation(animation) {
-            recipe.instructions = newInstructions
-        }
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.replaceInstructions(with: oldInstructions, undoManager: undoManager, animation: animation)
-        }
-    }
-
-    func deleteInstructions(offsets: IndexSet, undoManager: UndoManager? = nil) {
-        let oldInstructions = recipe.instructions
         recipe.instructions.remove(atOffsets: offsets)
         
         undoManager?.registerUndo(withTarget: self) { doc in
-            doc.replaceInstructions(with: oldInstructions, undoManager: undoManager)
+            doc.replaceInstructions(with: oldInstructions)
         }
     }
     
-    func moveInstructionsAt(offsets: IndexSet, toOffset: Int, undoManager: UndoManager? = nil) {
+    func moveInstructions(fromOffsets: IndexSet, toOffset: Int) {
         let oldInstructions = recipe.instructions
-        recipe.instructions.move(fromOffsets: offsets, toOffset: toOffset)
+        
+        recipe.instructions.move(fromOffsets: fromOffsets, toOffset: toOffset)
         
         undoManager?.registerUndo(withTarget: self) { doc in
-            // Use the replaceItems symmetric undoable-redoable function.
-            doc.replaceInstructions(with: oldInstructions, undoManager: undoManager)
-        }
-        
-    }
-    
-    func registerUndoInstructionChange(for index: Int, newInstruction: String, oldInstruction: String, undoManager: UndoManager?) {
-        let newInstructions = recipe.instructions
-        
-        recipe.instructions[index].instruction = newInstruction
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.recipe.instructions[index].instruction = oldInstruction
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.replaceInstructions(with: newInstructions, undoManager: undoManager, animation: nil)
-            }
-        }
-    }
-
-    // Utensil Functions
-    func addUtensil(utensil: Utensil, undoManager: UndoManager? = nil) {
-        recipe.utensils.append(utensil)
-        let count = recipe.utensils.count
-        undoManager?.registerUndo(withTarget: self) { doc in
-            withAnimation {
-                doc.deleteUtensil(index: count - 1, undoManager: undoManager)
-            }
+            doc.replaceInstructions(with: oldInstructions)
         }
     }
     
-    func deleteUtensil(index: Int, undoManager: UndoManager? = nil) {
-        let oldUtensils = recipe.utensils
-        withAnimation {
-            _ = recipe.utensils.remove(at: index)
-        }
+    func replaceInstructions(with newInstructions: Array<Instruction>) {
+        let oldInstructions = recipe.instructions
+        
+        recipe.instructions = newInstructions
         
         undoManager?.registerUndo(withTarget: self) { doc in
-            doc.replaceUtensils(with: oldUtensils, undoManager: undoManager)
-        }
-    }
-    
-    func deleteUtensilIDs(withIDs ids: [UUID], undoManager: UndoManager? = nil) {
-        var indexSet: IndexSet = IndexSet()
-
-        let enumerated = recipe.utensils.enumerated()
-        for (index, item) in enumerated where ids.contains(item.id) {
-            indexSet.insert(index)
-        }
-
-        deleteUtensils(offsets: indexSet, undoManager: undoManager)
-    }
-    
-    /// Replaces the existing items with a new set of items.
-    func replaceUtensils(with newUtensils: [Utensil], undoManager: UndoManager? = nil, animation: Animation? = .default) {
-        let oldUtensils = recipe.utensils
-        
-        withAnimation(animation) {
-            recipe.utensils = newUtensils
-        }
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.replaceUtensils(with: oldUtensils, undoManager: undoManager, animation: animation)
-        }
-    }
-
-    func deleteUtensils(offsets: IndexSet, undoManager: UndoManager? = nil) {
-        let oldUtensils = recipe.utensils
-        withAnimation {
-            recipe.utensils.remove(atOffsets: offsets)
-        }
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.replaceUtensils(with: oldUtensils, undoManager: undoManager)
-        }
-    }
-    
-    /// Relocates the specified items, and registers an undo action.
-    func moveUtensilsAt(offsets: IndexSet, toOffset: Int, undoManager: UndoManager? = nil) {
-        let oldUtensils = recipe.utensils
-        withAnimation {
-            recipe.utensils.move(fromOffsets: offsets, toOffset: toOffset)
-        }
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            // Use the replaceItems symmetric undoable-redoable function.
-            doc.replaceUtensils(with: oldUtensils, undoManager: undoManager)
-        }
-        
-    }
-    
-    func registerUndoUtensilChange(for index: Int, newUtensil: String, oldUtensil: String, undoManager: UndoManager?) {
-        let newUtensils = recipe.utensils
-        
-        recipe.utensils[index].utensil = newUtensil
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.recipe.utensils[index].utensil = oldUtensil
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.replaceUtensils(with: newUtensils, undoManager: undoManager, animation: nil)
-            }
-        }
-    }
-    
-    func registerUndoUtensilDetailChange(for index: Int, newDetail: String, oldDetail: String, undoManager: UndoManager?) {
-        let newUtensils = recipe.utensils
-        
-        recipe.utensils[index].detail = newDetail
-        
-        undoManager?.registerUndo(withTarget: self) { doc in
-            doc.recipe.utensils[index].utensil = oldDetail
-            
-            undoManager?.registerUndo(withTarget: self) { doc in
-                doc.replaceUtensils(with: newUtensils, undoManager: undoManager, animation: nil)
-            }
+            doc.replaceInstructions(with: oldInstructions)
         }
     }
 }

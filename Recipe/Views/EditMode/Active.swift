@@ -9,7 +9,6 @@ import SwiftUI
 
 struct Active: View {
     @EnvironmentObject var document: RecipeDocument
-    @Environment(\.undoManager) private var undoManager
     
     @State private var showImageSelector = false
     
@@ -42,19 +41,18 @@ struct Active: View {
             ImagePicker(selectedImage: Binding(get: {
                 document.image
             }, set: { newImage in
-                document.registerUndoImageChange(newImage: newImage, undoManager: undoManager)
-                document.image = newImage
+                document.setImage(to: newImage)
             }))
         }
         .toolbar {
-            Button { undoManager?.undo() } label: {
+            Button { document.undoManager?.undo() } label: {
                 Image(systemName: "arrow.uturn.backward.circle")
-                    .disabled(!(undoManager?.canUndo ?? false))
+                    .disabled(!(document.undoManager?.canUndo ?? false))
             }
         
-            Button { undoManager?.redo() } label: {
+            Button { document.undoManager?.redo() } label: {
                 Image(systemName: "arrow.uturn.forward.circle")
-                    .disabled(!(undoManager?.canRedo ?? false))
+                    .disabled(!(document.undoManager?.canRedo ?? false))
             }
             EditButton()
         }

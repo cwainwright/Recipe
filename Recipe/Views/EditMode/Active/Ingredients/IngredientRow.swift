@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct IngredientRow: View {
-    @Environment(\.undoManager) var undoManager
     @EnvironmentObject var document: RecipeDocument
     
     @State var index: Int
@@ -26,18 +25,16 @@ struct IngredientRow: View {
                 // Ingredient Input Field
                 TextField("Ingredient",
                     text: Binding(get: {
-                        ingredient.ingredient
+                        ingredient.name
                     }, set: { newValue in
-                        let oldValue = ingredient.ingredient
-                        document.recipe.ingredients[index].ingredient = newValue
-                        document.registerUndoIngredientChange(for: index, newIngredient: newValue, oldIngredient: oldValue, undoManager: undoManager)
+                        document.setIngredientName(of: index, to: newValue)
                     }),
                     prompt: Text("name")
                 )
                 
                 // Measure Text Input
                 NumericTextField(title: "Measure", prompt: "measure", data: $document.recipe.ingredients[index].measure) {
-                    document.registerUndoMeasureChange(for: index, newMeasure: $0, oldMeasure: $1, undoManager: undoManager)
+                    document.setIngredientMeasure(of: index, to: $0)
                 }
                 
                 //  Unit Input Field
@@ -46,9 +43,7 @@ struct IngredientRow: View {
                     text: Binding(get: {
                         ingredient.unit
                     }, set: { newValue in
-                        let oldValue = ingredient.unit
-                        document.recipe.ingredients[index].unit = newValue
-                        document.registerUndoUnitChange(for: index, newUnit: newValue, oldUnit: oldValue, undoManager: undoManager)
+                        document.setIngredientUnit(of: index, to: newValue)
                     })
                 )
                 .textInputAutocapitalization(.never)
